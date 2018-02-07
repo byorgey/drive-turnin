@@ -2,6 +2,7 @@ from __future__ import print_function
 import httplib2
 import os
 import io
+import sys
 
 from apiclient import discovery
 from apiclient.http import MediaIoBaseDownload
@@ -10,11 +11,13 @@ from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
 
-try:
-    import argparse
-    flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
-except ImportError:
-    flags = None
+import csv
+
+# try:
+#     import argparse
+#     flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
+# except ImportError:
+#     flags = None
 
 # If modifying these scopes, delete your previously saved credentials
 # at ~/.credentials/drive-python-quickstart.json
@@ -44,10 +47,10 @@ def get_credentials():
     if not credentials or credentials.invalid:
         flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
         flow.user_agent = APPLICATION_NAME
-        if flags:
-            credentials = tools.run_flow(flow, store, flags)
-        else: # Needed only for compatibility with Python 2.6
-            credentials = tools.run(flow, store)
+        # if flags:
+        #     credentials = tools.run_flow(flow, store, flags)
+        # else: # Needed only for compatibility with Python 2.6
+        credentials = tools.run(flow, store)
         print('Storing credentials to ' + credential_path)
     return credentials
 
@@ -71,21 +74,43 @@ def get_credentials():
 #         for item in items:
 #             print('{0} ({1})'.format(item['name'], item['id']))
 
+classes = \
+    { 'FP' : '14liZp193oz9-51qylm4UIWT1vDsb5W8VPawAVDUv8QY' \
+    , '150': '1cbkg-Qn_KPsQEq0BcTssJ99HJn5OWxOFpiltPjpGg_A' \
+    }
+
 def main():
+    file_id = classes[sys.argv[1]]
+
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('drive', 'v3', http=http)
 
-    file_id = '14liZp193oz9-51qylm4UIWT1vDsb5W8VPawAVDUv8QY'
+    filename = 'turnin-%s.csv' % sys.argv[1]
+    download(service, file_id, filename)
+
+    if len(sys.argv) > 2:
+
+        with open(filename, 'rb') as csvfile:
+            submissions = csv.reader(csvfile, delimiter=',', quotechar='"')
+            assignment = sys.argv[2]
+            for s in submissions:
+                if (assignment in s[2]):
+                    os.mkdir(s[1])
+                    for f in s[3].split(', '):
+                        file_id = f.split('=')[-1]
+                        download(service, file_id, s[1] + '/' + file_id)
+
+def download(service, file_id, filename):
     request = service.files().export_media(fileId=file_id,
                                            mimeType='text/csv')
 
-    filename = 'turnin-365.csv'
     fh = io.FileIO(filename, 'wb')
     downloader = MediaIoBaseDownload(fh, request)
     done = False
     while done is False:
         status, done = downloader.next_chunk()
         print("Download %d%%." % int(status.progress() * 100))
+
 if __name__ == '__main__':
     main()
