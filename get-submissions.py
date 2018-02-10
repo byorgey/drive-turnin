@@ -1,8 +1,12 @@
+#!/usr/bin/python
+
 from __future__ import print_function
 import httplib2
 import os
 import io
 import sys
+
+import re
 
 from apiclient import discovery
 from apiclient.http import MediaIoBaseDownload
@@ -87,7 +91,8 @@ def main():
     service = discovery.build('drive', 'v3', http=http)
 
     filename = 'turnin-%s.csv' % sys.argv[1]
-    download(service, file_id, filename)
+    csv_request = service.files().export_media(fileId=file_id, mimeType='text/csv')
+    download(csv_request, filename)
 
     if len(sys.argv) > 2:
 
@@ -96,15 +101,24 @@ def main():
             assignment = sys.argv[2]
             for s in submissions:
                 if (assignment in s[2]):
+                    print("---------- %s ----------" % s[1])
                     os.mkdir(s[1])
                     for f in s[3].split(', '):
                         file_id = f.split('=')[-1]
-                        download(service, file_id, s[1] + '/' + file_id)
+                        filename = service.files().get(fileId=file_id).execute()['name']
+                        filename = re.sub(r" - [^.]*", '', filename)
+                        try:
+                            file_request = service.files().get_media(fileId=file_id)
+                            download(file_request, s[1] + '/' + filename)
+                        except:
+                            try:
+                                file_request = service.files().export_media(fileId=file_id, mimeType='application/pdf')
+                                download(file_request, s[1] + '/' + filename)
+                            except:
+                                print("Downloading %s failed." % filename)
 
-def download(service, file_id, filename):
-    request = service.files().export_media(fileId=file_id,
-                                           mimeType='text/csv')
-
+def download(request, filename):
+    print("Downloading %s..." % filename)
     fh = io.FileIO(filename, 'wb')
     downloader = MediaIoBaseDownload(fh, request)
     done = False
