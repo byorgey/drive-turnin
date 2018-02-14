@@ -84,6 +84,10 @@ classes = \
     }
 
 def main():
+    if len(sys.argv) < 3:
+        print("Usage: get-submissions.py <150|FP> <search term>")
+        sys.exit(0)
+
     file_id = classes[sys.argv[1]]
 
     credentials = get_credentials()
