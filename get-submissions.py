@@ -79,13 +79,12 @@ def get_credentials():
 #             print('{0} ({1})'.format(item['name'], item['id']))
 
 classes = \
-    { 'FP' : '14liZp193oz9-51qylm4UIWT1vDsb5W8VPawAVDUv8QY' \
-    , '150': '1cbkg-Qn_KPsQEq0BcTssJ99HJn5OWxOFpiltPjpGg_A' \
+    { '360' : '1rczrzPv9miqcyyzz23gOeSvItQa4Pv5Kh4sMPk85pZ4'
     }
 
 def main():
     if len(sys.argv) < 3:
-        print("Usage: get-submissions.py <150|FP> <search term>")
+        print("Usage: get-submissions.py <150|360> <search term>")
         sys.exit(0)
 
     file_id = classes[sys.argv[1]]
