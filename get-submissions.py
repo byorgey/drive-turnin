@@ -79,7 +79,8 @@ def get_credentials():
 #             print('{0} ({1})'.format(item['name'], item['id']))
 
 classes = \
-    { '360' : '1rczrzPv9miqcyyzz23gOeSvItQa4Pv5Kh4sMPk85pZ4'
+    { '360' : '1rczrzPv9miqcyyzz23gOeSvItQa4Pv5Kh4sMPk85pZ4',
+      '150' : '1CLDFl_zbIjc_H9-Zl4FCOYG0EEf3wjjj4iPxLUGmvAo'
     }
 
 def main():
@@ -105,7 +106,10 @@ def main():
             for s in submissions:
                 if (assignment in s[2]):
                     print("---------- %s ----------" % s[1])
-                    os.mkdir(s[1])
+                    try:
+                        os.mkdir(s[1])
+                    except OSError:
+                        pass
                     for f in s[3].split(', '):
                         file_id = f.split('=')[-1]
                         filename = service.files().get(fileId=file_id).execute()['name']
