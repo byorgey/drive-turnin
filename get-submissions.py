@@ -80,21 +80,23 @@ def get_credentials():
 
 classes = \
     { '360' : '1rczrzPv9miqcyyzz23gOeSvItQa4Pv5Kh4sMPk85pZ4',
-      '150' : '1CLDFl_zbIjc_H9-Zl4FCOYG0EEf3wjjj4iPxLUGmvAo'
+      '150' : '1CLDFl_zbIjc_H9-Zl4FCOYG0EEf3wjjj4iPxLUGmvAo',
+      '150g' : '1auobdkG-_Fh1tucEnNxBklxHKZ7TTwuLhoxJCz5bjOM'
     }
 
 def main():
-    if len(sys.argv) < 3:
-        print("Usage: get-submissions.py <150|360> <search term>")
-        sys.exit(0)
-
-    file_id = classes[sys.argv[1]]
+    key = sys.argv[1]
+    file_id = classes[key]
 
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('drive', 'v3', http=http)
 
-    filename = 'turnin-%s.csv' % sys.argv[1]
+    if (key[-1] == 'g'):
+        filename = 'gradebook-%s.csv' % key[:-1]
+    else:
+        filename = 'turnin-%s.csv' % key
+
     csv_request = service.files().export_media(fileId=file_id, mimeType='text/csv')
     download(csv_request, filename)
 
