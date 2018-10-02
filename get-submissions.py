@@ -86,7 +86,10 @@ classes = \
 
 def main():
     key = sys.argv[1]
-    file_id = classes[key]
+    if key in classes:
+        file_id = classes[key]
+    else:
+        file_id = key
 
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
