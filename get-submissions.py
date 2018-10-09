@@ -81,7 +81,8 @@ def get_credentials():
 classes = \
     { '360' : '1rczrzPv9miqcyyzz23gOeSvItQa4Pv5Kh4sMPk85pZ4',
       '150' : '1CLDFl_zbIjc_H9-Zl4FCOYG0EEf3wjjj4iPxLUGmvAo',
-      '150g' : '1auobdkG-_Fh1tucEnNxBklxHKZ7TTwuLhoxJCz5bjOM'
+      '150g' : '1auobdkG-_Fh1tucEnNxBklxHKZ7TTwuLhoxJCz5bjOM',
+      '382' : '1t9v1Pk5wKTU0ODcKRJ7PEmFl2eOrsUEDY9qXVyCn-wg'
     }
 
 def main():
