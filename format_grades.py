@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import re
 import os
 import sys
 import csv
@@ -10,6 +11,8 @@ if len(sys.argv) < 3:
 
 gradebook_file = sys.argv[1]
 outdir         = sys.argv[2]
+
+classNum = re.match(r".*-(\d+)\.csv", gradebook_file).group(1)
 
 with open(gradebook_file, 'r') as gradebook:
     lineCount = 0
@@ -28,6 +31,6 @@ with open(gradebook_file, 'r') as gradebook:
             except OSError:  # dir already exists
                 pass
 
-            with open(d + "/grades.txt", 'w') as student_file:
+            with open("%s/%s-grades.txt" % (d, classNum), 'w') as student_file:
                 for i in range(len(header)):
                     student_file.write('%-25s: %s\n' % (header[i], entry[i]))
