@@ -24,13 +24,14 @@ with open(gradebook_file, 'r') as gradebook:
             emailColumn: int = entry.index('E-mail')
         else:
             email = entry[emailColumn]
-            print("Formatting grades for " + email + "...")
-            d = outdir + "/" + email
-            try:
-                os.makedirs(d)
-            except OSError:  # dir already exists
-                pass
+            if email != '':
+                print("Formatting grades for " + email + "...")
+                d = outdir + "/" + email
+                try:
+                    os.makedirs(d)
+                except OSError:  # dir already exists
+                    pass
 
-            with open("%s/%s-grades.txt" % (d, classNum), 'w') as student_file:
-                for i in range(len(header)):
-                    student_file.write('%-25s: %s\n' % (header[i], entry[i]))
+                with open("%s/%s-grades.txt" % (d, classNum), 'w') as student_file:
+                    for i in range(len(header)):
+                        student_file.write('%-25s: %s\n' % (header[i], entry[i]))
