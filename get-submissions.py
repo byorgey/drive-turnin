@@ -118,6 +118,9 @@ def main():
                         os.mkdir(s[1])
                     except OSError:
                         pass
+                    with open(s[1] + '/submission.txt', 'w') as submissionfile:
+                        for line in s:
+                            submissionfile.write(line + '\n')
                     for f in s[3].split(', '):
                         file_id = f.split('=')[-1]
                         filename = service.files().get(fileId=file_id).execute()['name']
