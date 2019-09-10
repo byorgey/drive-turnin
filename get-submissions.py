@@ -108,27 +108,36 @@ def main():
         with open(filename, 'rb') as csvfile:
             submissions = csv.reader(csvfile, delimiter=',', quotechar='"')
             assignment = sys.argv[2]
+
+            first_line = True
+
             for s in submissions:
-                if (assignment in s[2]):
-                    print("---------- %s ----------" % s[1])
+                if first_line:
+                    first_line = False
+                    assignment_col = s.index('Assignment')
+
+                elif (assignment in s[assignment_col]):
+                    student_name = s[1]
+
+                    print("---------- %s ----------" % student_name)
                     try:
-                        os.mkdir(s[1])
+                        os.mkdir(student_name)
                     except OSError:
                         pass
-                    with open(s[1] + '/submission.txt', 'w') as submissionfile:
+                    with open(student_name + '/submission.txt', 'w') as submissionfile:
                         for line in s:
                             submissionfile.write(line + '\n')
-                    for f in s[3].split(', '):
+                    for f in s[assignment_col + 1].split(', '):
                         file_id = f.split('=')[-1]
                         filename = service.files().get(fileId=file_id).execute()['name']
                         filename = re.sub(r" - [^.]*", '', filename)
                         try:
                             file_request = service.files().get_media(fileId=file_id)
-                            download(file_request, s[1] + '/' + filename)
+                            download(file_request, student_name + '/' + filename)
                         except:
                             try:
                                 file_request = service.files().export_media(fileId=file_id, mimeType='application/pdf')
-                                download(file_request, s[1] + '/' + filename)
+                                download(file_request, student_name + '/' + filename)
                             except:
                                 print("Downloading %s failed." % filename)
 
