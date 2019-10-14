@@ -80,7 +80,9 @@ def get_credentials():
 
 classes = \
     { '410': '16uEZZovgkV9ZwtvQn2hLM_okPjf5RleFdrlXTMMlT8Y',
+      '410g': '1y7UgQjg5e8TUqYj56zOKHfFAw2fBy7rqw8iNAW5AFpM',
       '382': '1gie8eMk6dzo9OuSK2ZYBsfbo-R9uoHbEtyO3UYre44Q',
+      '382g': '14xSP6Qp7ydp0nu4oI-w68nqu6Y7JNo3uUcvuiE5twkc',
       '150': '1pY74PZ-hDT6ZN9hzp8u9VoHIj3CrytL6PM2qDH5rWG0'
     }
 
