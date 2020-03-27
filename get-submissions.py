@@ -79,11 +79,9 @@ def get_credentials():
 #             print('{0} ({1})'.format(item['name'], item['id']))
 
 classes = \
-    { '410': '16uEZZovgkV9ZwtvQn2hLM_okPjf5RleFdrlXTMMlT8Y',
-      '410g': '1y7UgQjg5e8TUqYj56zOKHfFAw2fBy7rqw8iNAW5AFpM',
-      '382': '1gie8eMk6dzo9OuSK2ZYBsfbo-R9uoHbEtyO3UYre44Q',
-      '382g': '14xSP6Qp7ydp0nu4oI-w68nqu6Y7JNo3uUcvuiE5twkc',
-      '150': '1pY74PZ-hDT6ZN9hzp8u9VoHIj3CrytL6PM2qDH5rWG0'
+    { 'M240': '1gCz4U4nnXoTILyWkwjtqx24N3x_k3Qt_6fu7kCfgD7M'
+    , 'M240g': '1R5LGT8jozDsUxH3eVl1UHXcCeC7TqgfhbVMw5lp4uAc'
+    , '365g': '1q6_O7cC814wTkusnjRDnWgcChkTb3k1L8L4P2I2V1Fo'
     }
 
 def main():

@@ -12,7 +12,19 @@ if len(sys.argv) < 3:
 gradebook_file = sys.argv[1]
 outdir         = sys.argv[2]
 
-classNum = re.match(r".*-(\d+)\.csv", gradebook_file).group(1)
+classNum = re.match(r".*-(M?\d+)\.csv", gradebook_file).group(1)
+
+classNames =\
+    { '365': 'Functional Programming',
+      'M240': 'Discrete Math',
+      '410': 'Senior Seminar',
+      '150': 'CSCI 150',
+      '151': 'Data Structures',
+      '360': 'Programming Languages',
+      '382': 'Algorithms'
+    }
+
+className: str = classNames[classNum]
 
 with open(gradebook_file, 'r') as gradebook:
     lineCount = 0
@@ -21,10 +33,15 @@ with open(gradebook_file, 'r') as gradebook:
         lineCount += 1
         if lineCount == 1:
             header = entry
-            emailColumn: int = entry.index('E-mail')
+            emailColumn: int = entry.index('Email')
+            nameColumn: int = entry.index('Preferred')
+
+            droppedColumn: int = entry.index('Dropped (!)')
         else:
             email = entry[emailColumn]
-            if email != '':
+            name  = entry[nameColumn]
+            dropped = entry[droppedColumn]
+            if email != '' and dropped != '1':
                 print("Formatting grades for " + email + "...")
                 d = outdir + "/" + email
                 try:
@@ -33,5 +50,13 @@ with open(gradebook_file, 'r') as gradebook:
                     pass
 
                 with open("%s/%s-grades.txt" % (d, classNum), 'w') as student_file:
+
+                    student_file.write(f'Subject: Current {className} grades\n')
+                    student_file.write(f'To: {email}\n')
+                    student_file.write(f'From: Brent Yorgey <yorgey@hendrix.edu>\n\n')
+
+                    student_file.write(f'Dear {name},\n\n')
+                    student_file.write(f'Here are your most recent grades for {className}.  I do sometimes make mistakes or miss things, so please let me know if you have any questions or notice any discrepancies.\n\n')
                     for i in range(len(header)):
-                        student_file.write('%-25s: %s\n' % (header[i], entry[i]))
+                        if ('(!)' not in header[i]):
+                            student_file.write('%-25s: %s\n' % (header[i], entry[i]))
