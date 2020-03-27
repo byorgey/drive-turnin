@@ -5,14 +5,22 @@ import os
 import sys
 import csv
 
-if len(sys.argv) < 3:
-    print("Usage: format_grades.py <gradebook> <output dir>")
+CURSEMESTER = '20G'
+
+if len(sys.argv) < 2:
+    print("Usage: format_grades.py <gradebook> [<output dir>]")
     sys.exit(0)
 
 gradebook_file = sys.argv[1]
-outdir         = sys.argv[2]
 
 classNum = re.match(r".*-(M?\d+)\.csv", gradebook_file).group(1)
+
+
+if len(sys.argv) < 3:
+    outdir = f'/home/brent/teaching/{classNum}/{CURSEMESTER}/grades/'
+    print(f'Defaulting to output dir {outdir}...')
+else:
+    outdir         = sys.argv[2]
 
 classNames =\
     { '365': 'Functional Programming',
@@ -36,12 +44,17 @@ with open(gradebook_file, 'r') as gradebook:
             emailColumn: int = entry.index('Email')
             nameColumn: int = entry.index('Preferred')
 
-            droppedColumn: int = entry.index('Dropped (!)')
+            try:
+                droppedColumn: int = entry.index('Dropped (!)')
+            except ValueError:
+                droppedColumn = -1
         else:
             email = entry[emailColumn]
             name  = entry[nameColumn]
-            dropped = entry[droppedColumn]
-            if email != '' and dropped != '1':
+            if droppedColumn != -1:
+                dropped = entry[droppedColumn]
+
+            if email != '' and (droppedColumn == -1 or dropped != '1'):
                 print("Formatting grades for " + email + "...")
                 d = outdir + "/" + email
                 try:
