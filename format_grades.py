@@ -5,7 +5,7 @@ import os
 import sys
 import csv
 
-CURSEMESTER = '20G'
+CURSEMESTER = '20L'
 
 if len(sys.argv) < 2:
     print("Usage: format_grades.py <gradebook> [<output dir>]")
@@ -33,6 +33,16 @@ classNames =\
     }
 
 className: str = classNames[classNum]
+
+with open(gradebook_file, 'r') as gradebook:
+    lineCount = 0
+    entries = csv.reader(gradebook, delimiter=',', quotechar='"')
+    totals = []
+    for entry in entries:
+        lineCount += 1
+        if lineCount > 1 and 'Total' in entry:
+            totals = entry
+            break
 
 with open(gradebook_file, 'r') as gradebook:
     lineCount = 0
@@ -72,4 +82,10 @@ with open(gradebook_file, 'r') as gradebook:
                     student_file.write(f'Here are your most recent grades for {className}.  I do sometimes make mistakes or miss things, so please let me know if you have any questions or notice any discrepancies.\n\n')
                     for i in range(len(header)):
                         if ('(!)' not in header[i]):
-                            student_file.write('%-25s: %s\n' % (header[i], entry[i]))
+                            field = header[i]
+                            if (field[0] == '-'):
+                                field = '  ' + field[1:]
+                            if (totals[i] == '' or totals[i] == 'Total'):
+                                student_file.write('%-25s: %s\n' % (field, entry[i]))
+                            else:
+                                student_file.write('%-25s: %5s / %3s\n' % (field, entry[i], totals[i]))
