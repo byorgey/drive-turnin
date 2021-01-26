@@ -5,7 +5,7 @@ import os
 import sys
 import csv
 
-CURSEMESTER = '20G'
+CURSEMESTER = '21G'
 
 if len(sys.argv) < 2:
     print("Usage: format_grades.py <gradebook> [<output dir>]")

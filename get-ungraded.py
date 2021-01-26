@@ -5,6 +5,7 @@ import httplib2
 import os
 import io
 import sys
+import subprocess
 
 import re
 
@@ -16,6 +17,8 @@ from oauth2client import tools
 from oauth2client.file import Storage
 
 import csv
+
+import chevron
 
 # try:
 #     import argparse
@@ -102,43 +105,59 @@ def main():
     csv_request = service.files().export_media(fileId=file_id, mimeType='text/csv')
     download(csv_request, filename)
 
-    if len(sys.argv) > 2:
+    with open(filename, 'r') as csvfile:
+        submissions = csv.reader(csvfile, delimiter=',', quotechar='"')
 
-        with open(filename, 'r') as csvfile:
-            submissions = csv.reader(csvfile, delimiter=',', quotechar='"')
-            assignment = sys.argv[2]
+        first_line = True
 
-            first_line = True
+        for s in submissions:
+            if first_line:
+                first_line = False
+                assignment_col = s.index('Assignment')
+                graded_col = s.index('Graded')
 
-            for s in submissions:
-                if first_line:
-                    first_line = False
-                    assignment_col = s.index('Assignment')
+            elif (s[graded_col] != 'Y'):
+                timestamp = s[0].replace('/', '-')
+                student_name = s[1].strip()
+                assignment = s[2].replace('#', '').strip()
 
-                elif (assignment in s[assignment_col]):
-                    student_name = s[1]
+                print("---------- %s ----------" % student_name)
 
-                    print("---------- %s ----------" % student_name)
+                filecounter = 0
+                for f in s[assignment_col + 1].split(', '):
+                    file_id = f.split('=')[-1]
+                    if filecounter > 0:
+                        fileLetter = chr(ord('A') + filecounter)
+                    else:
+                        fileLetter = ''
+                    filename = f'{student_name} {timestamp} {assignment}{fileLetter}'
+                    pdf = filename + '.submit.pdf'
                     try:
-                        os.mkdir(student_name)
-                    except OSError:
-                        pass
-                    with open(student_name + '/submission.txt', 'w') as submissionfile:
-                        for line in s:
-                            submissionfile.write(line + '\n')
-                    for f in s[assignment_col + 1].split(', '):
-                        file_id = f.split('=')[-1]
-                        filename = service.files().get(fileId=file_id).execute()['name']
-                        filename = re.sub(r" - [^.]*", '', filename)
+                        file_request = service.files().get_media(fileId=file_id)
+                        download(file_request, pdf)
+                    except:
                         try:
-                            file_request = service.files().get_media(fileId=file_id)
-                            download(file_request, student_name + '/' + filename)
+                            file_request = service.files().export_media(fileId=file_id, mimeType='application/pdf')
+                            download(file_request, pdf)
                         except:
-                            try:
-                                file_request = service.files().export_media(fileId=file_id, mimeType='application/pdf')
-                                download(file_request, student_name + '/' + filename)
-                            except:
-                                print("Downloading %s failed." % filename)
+                            print("Downloading %s failed." % pdf)
+
+                    d = { 'name': student_name,
+                          'timestamp': timestamp,
+                          'problems': assignment,
+                          'estimate': s[4].replace('#', '\\#'),
+                          'comments': s[5].replace('#', '\\#')
+                        }
+
+                    with open('cover-sheet.tex.mustache', 'r') as tpl, open(filename + '.cover.tex', 'w') as cover_sheet:
+                        cover_sheet.write(chevron.render(tpl, d))
+
+                    subprocess.run(['pdflatex', filename + '.cover.tex'])
+                    subprocess.run(['pdftk', filename + '.cover.pdf', filename + '.submit.pdf',
+                                    'output', filename + '.pdf'])
+                    os.system('rm *.aux *.log *.tex *.submit.pdf *.cover.pdf')
+
+                    filecounter += 1
 
 def download(request, filename):
     print("Downloading %s..." % filename)
