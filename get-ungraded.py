@@ -114,9 +114,9 @@ def main():
             if first_line:
                 first_line = False
                 assignment_col = s.index('Assignment')
-                graded_col = s.index('Graded')
+                downloaded_col = s.index('DL')
 
-            elif (s[graded_col] != 'Y'):
+            elif (s[downloaded_col] != 'Y'):
                 timestamp = s[0].replace('/', '-')
                 student_name = s[1].strip()
                 assignment = s[2].replace('#', '').strip()
