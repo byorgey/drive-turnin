@@ -87,6 +87,10 @@ classes = \
     }
 
 def main():
+    if len(sys.argv) < 2:
+        print("Usage: get-ungraded.py <class>")
+        sys.exit(0)
+
     key = sys.argv[1]
     if key in classes:
         file_id = classes[key]
@@ -149,7 +153,7 @@ def main():
                           'comments': s[5].replace('#', '\\#')
                         }
 
-                    with open('cover-sheet.tex.mustache', 'r') as tpl, open(filename + '.cover.tex', 'w') as cover_sheet:
+                    with open('../cover-sheet.tex.mustache', 'r') as tpl, open(filename + '.cover.tex', 'w') as cover_sheet:
                         cover_sheet.write(chevron.render(tpl, d))
 
                     subprocess.run(['pdflatex', filename + '.cover.tex'])
