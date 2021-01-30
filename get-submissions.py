@@ -116,7 +116,7 @@ def main():
                     assignment_col = s.index('Assignment')
 
                 elif (assignment in s[assignment_col]):
-                    student_name = s[1]
+                    student_name = s[1].replace('/','')
 
                     print("---------- %s ----------" % student_name)
                     try:
