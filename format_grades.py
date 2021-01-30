@@ -8,7 +8,7 @@ import csv
 CURSEMESTER = '21G'
 
 if len(sys.argv) < 2:
-    print("Usage: format_grades.py <gradebook> [<output dir>]")
+    print("Usage: format_grades.py <gradebook> [<message file>] [<output dir>]")
     sys.exit(0)
 
 gradebook_file = sys.argv[1]
@@ -16,11 +16,12 @@ gradebook_file = sys.argv[1]
 classNum = re.match(r".*-(M?\d+)\.csv", gradebook_file).group(1)
 
 
-if len(sys.argv) < 3:
+if len(sys.argv) < 4:
     outdir = f'/home/brent/teaching/{classNum}/{CURSEMESTER}/grades/'
     print(f'Defaulting to output dir {outdir}...')
 else:
-    outdir         = sys.argv[2]
+    print(f'Using custom output dir {sys.argv[3]}...')
+    outdir = sys.argv[3]
 
 classNames =\
     { '365': 'Functional Programming',
@@ -33,6 +34,14 @@ classNames =\
     }
 
 className: str = classNames[classNum]
+
+if len(sys.argv) < 3:
+    print('Using default message...')
+    message = f'Here are your most recent grades for {className}.  I do sometimes make mistakes or miss things, so please let me know if you have any questions or notice any discrepancies.\n\n'
+else:
+    print(f'Loading message from {sys.argv[2]}...')
+    with open(sys.argv[2], 'r') as msgfile:
+        message = msgfile.read()
 
 with open(gradebook_file, 'r') as gradebook:
     lineCount = 0
@@ -79,9 +88,9 @@ with open(gradebook_file, 'r') as gradebook:
                     student_file.write(f'From: Brent Yorgey <yorgey@hendrix.edu>\n\n')
 
                     student_file.write(f'Dear {name},\n\n')
-                    student_file.write(f'Here are your most recent grades for {className}.  I do sometimes make mistakes or miss things, so please let me know if you have any questions or notice any discrepancies.\n\n')
+                    student_file.write(message)
                     for i in range(len(header)):
-                        if ('(!)' not in header[i]):
+                        if ('(!)' not in header[i] and header[i] != ''):
                             field = header[i]
                             if (field[0] == '-'):
                                 field = '  ' + field[1:]
