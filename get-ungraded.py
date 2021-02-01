@@ -123,7 +123,9 @@ def main():
             elif (s[downloaded_col] != 'Y'):
                 timestamp = s[0].replace('/', '-')
                 student_name = s[1].strip()
-                assignment = s[2].replace('#', '').strip()
+                assignment = s[2].strip()
+                assignment_stripped = assignment.replace('#','')
+                assignment_escaped  = escape(assignment)
 
                 print("---------- %s ----------" % student_name)
 
@@ -134,7 +136,7 @@ def main():
                         fileLetter = chr(ord('A') + filecounter)
                     else:
                         fileLetter = ''
-                    filename = f'{student_name} {timestamp} {assignment}{fileLetter}'
+                    filename = f'{student_name} {timestamp} {assignment_stripped}{fileLetter}'
                     pdf = filename + '.submit.pdf'
                     try:
                         file_request = service.files().get_media(fileId=file_id)
@@ -148,9 +150,10 @@ def main():
 
                     d = { 'name': student_name,
                           'timestamp': timestamp,
-                          'problems': assignment,
-                          'estimate': s[4].replace('#', '\\#'),
-                          'comments': s[5].replace('#', '\\#')
+                          'problems': assignment_escaped,
+                          'problemlist': [{'problem': p} for p in assignment_escaped.split(', ')],
+                          'estimate': escape(s[4]),
+                          'comments': escape(s[5]),
                         }
 
                     with open('../cover-sheet.tex.mustache', 'r') as tpl, open(filename + '.cover.tex', 'w') as cover_sheet:
@@ -171,6 +174,9 @@ def download(request, filename):
     while done is False:
         status, done = downloader.next_chunk()
         print("Download %d%%." % int(status.progress() * 100))
+
+def escape(s):
+    return s.replace('#', '\\#').replace('&', '\\&')
 
 if __name__ == '__main__':
     main()
