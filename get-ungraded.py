@@ -129,15 +129,15 @@ def main():
 
                 print("---------- %s ----------" % student_name)
 
+                filename = f'{student_name} {timestamp} {assignment_stripped}'
+
                 filecounter = 0
+                filelist = []
                 for f in s[assignment_col + 1].split(', '):
                     file_id = f.split('=')[-1]
-                    if filecounter > 0:
-                        fileLetter = chr(ord('A') + filecounter)
-                    else:
-                        fileLetter = ''
-                    filename = f'{student_name} {timestamp} {assignment_stripped}{fileLetter}'
-                    pdf = filename + '.submit.pdf'
+                    fileLetter = chr(ord('A') + filecounter)
+                    pdf = filename + f'{fileLetter}.part'
+                    filelist.append(pdf)
                     try:
                         file_request = service.files().get_media(fileId=file_id)
                         download(file_request, pdf)
@@ -148,23 +148,27 @@ def main():
                         except:
                             print("Downloading %s failed." % pdf)
 
-                    d = { 'name': student_name,
-                          'timestamp': timestamp,
-                          'problems': assignment_escaped,
-                          'problemlist': [{'problem': p} for p in assignment_escaped.split(', ')],
-                          'estimate': escape(s[4]),
-                          'comments': escape(s[5]),
-                        }
-
-                    with open('../cover-sheet.tex.mustache', 'r') as tpl, open(filename + '.cover.tex', 'w') as cover_sheet:
-                        cover_sheet.write(chevron.render(tpl, d))
-
-                    subprocess.run(['pdflatex', filename + '.cover.tex'])
-                    subprocess.run(['pdftk', filename + '.cover.pdf', filename + '.submit.pdf',
-                                    'output', filename + '.pdf'])
-                    os.system('rm *.aux *.log *.tex *.submit.pdf *.cover.pdf')
-
                     filecounter += 1
+
+                # combine multiple PDFs into one
+                subprocess.run(['pdftk'] + filelist + ['output', filename + '.submit.pdf'])
+                os.system('rm *.part')
+
+                d = { 'name': student_name,
+                      'timestamp': timestamp,
+                      'problems': assignment_escaped,
+                      'problemlist': [{'problem': p} for p in assignment_escaped.split(', ')],
+                      'estimate': escape(s[4]),
+                      'comments': escape(s[5]),
+                    }
+
+                with open('../cover-sheet.tex.mustache', 'r') as tpl, open(filename + '.cover.tex', 'w') as cover_sheet:
+                    cover_sheet.write(chevron.render(tpl, d))
+
+                subprocess.run(['pdflatex', filename + '.cover.tex'])
+                subprocess.run(['pdftk', filename + '.cover.pdf', filename + '.submit.pdf',
+                                'output', filename + '.pdf'])
+                os.system('rm *.aux *.log *.tex *.submit.pdf *.cover.pdf')
 
 def download(request, filename):
     print("Downloading %s..." % filename)
