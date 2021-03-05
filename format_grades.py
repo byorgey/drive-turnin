@@ -94,7 +94,7 @@ with open(gradebook_file, 'r') as gradebook:
                             field = header[i]
                             if (field[0] == '-'):
                                 field = '  ' + field[1:]
-                            if (totals[i] == '' or totals[i] == 'Total'):
+                            if (totals == [] or totals[i] == '' or totals[i] == 'Total'):
                                 student_file.write('%-25s: %s\n' % (field, entry[i]))
                             else:
                                 student_file.write('%-25s: %5s / %3s\n' % (field, entry[i], totals[i]))
