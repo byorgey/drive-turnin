@@ -25,12 +25,12 @@ with Path("~/.aliases/stu.aliases").expanduser().open() as aliases:
     for alias in aliases:
         m = re.search(r"\"(.*) <(.*)>", alias)
         if m:
-            alias_dict[m.group(1)] = m.group(2)
+            alias_dict[m.group(1).lower()] = m.group(2)
 
 for f in files:
     name = ' '.join(f.replace(',','').split(' ')[:2])
-    if name in alias_dict:
-        email = alias_dict[name]
+    if name.lower() in alias_dict:
+        email = alias_dict[name.lower()]
         print(f'Sending {f} to {name} ({email})...')
         with open(template, 'r') as template_file:
             if template.endswith('txt'):
