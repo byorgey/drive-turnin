@@ -131,6 +131,9 @@ def main():
 
                 filename = f'{student_name} {timestamp} {assignment_stripped}'
 
+                if len(filename) > 200:
+                    filename = filename[:200]
+
                 filecounter = 0
                 filelist = []
                 for f in s[assignment_col + 1].split(', '):
