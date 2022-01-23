@@ -8,6 +8,10 @@ import sys
 
 import re
 
+# See https://stackoverflow.com/questions/34550023/imported-python-module-overrides-option-parser
+args = sys.argv
+sys.argv = [sys.argv[0]]
+
 from apiclient import discovery
 from apiclient.http import MediaIoBaseDownload
 
@@ -19,7 +23,7 @@ import csv
 
 # try:
 #     import argparse
-#     flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
+#     flags, extras = argparse.ArgumentParser(parents=[tools.argparser]).parse_known_args(None)
 # except ImportError:
 #     flags = None
 
@@ -54,7 +58,7 @@ def get_credentials():
         # if flags:
         #     credentials = tools.run_flow(flow, store, flags)
         # else: # Needed only for compatibility with Python 2.6
-        credentials = tools.run(flow, store)
+        credentials = tools.run_flow(flow, store)
         print('Storing credentials to ' + credential_path)
     return credentials
 
@@ -79,17 +83,11 @@ def get_credentials():
 #             print('{0} ({1})'.format(item['name'], item['id']))
 
 classes = \
-    { 'M240': '1KVbd5FM4yZELhKEtEZC9VWadx2qBvuMCy-6adZqA78U',
-      'M240g': '1p-_r0K6PEItKtfQH4teRWVJbryxgjWSu6vWNmu9--Us',
-      '150': '1-l0ldBmgnj81CA4hvwa9RmkgSOhBS-MfA3d7e5EUkMo',
-      '150g': '12a4XbkQysJ7Abeo3Y7xt14CdfDYj1ydPPs-hw_04l8w',
-      '360': '1pwy7DpAgnL-q91POSFLAnlEjhWUIux6uV-UsO8LWvY0',
-      '360g': '1J-Q6tppNM3lwjM98_h_DsJ9d_H_eFzvIooQ3Hx8ZlBo',
-      'PL': '1pwy7DpAgnL-q91POSFLAnlEjhWUIux6uV-UsO8LWvY0'
+    { 'CSO': '1kWbOq1nwQLgVYeAvB6yM0SKzKh28iNUgZ84laItVSIU'
     }
 
 def main():
-    key = sys.argv[1]
+    key = args[1]
     if key in classes:
         file_id = classes[key]
     else:
@@ -107,11 +105,11 @@ def main():
     csv_request = service.files().export_media(fileId=file_id, mimeType='text/csv')
     download(csv_request, filename)
 
-    if len(sys.argv) > 2:
+    if len(args) > 2:
 
         with open(filename, 'r') as csvfile:
             submissions = csv.reader(csvfile, delimiter=',', quotechar='"')
-            assignment = sys.argv[2]
+            assignment = args[2]
 
             first_line = True
 
