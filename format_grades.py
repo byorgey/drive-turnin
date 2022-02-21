@@ -6,7 +6,7 @@ import sys
 import csv
 from pathlib import Path
 
-CURSEMESTER = '21G'
+CURSEMESTER = '22G'
 
 if len(sys.argv) < 2:
     print("Usage: format_grades.py <gradebook> [<message file>] [<subject>] [<output dir>]")
@@ -35,14 +35,21 @@ classNames =\
       '151': 'Data Structures',
       '360': 'Programming Languages',
       '382': 'Algorithms',
+      '322': 'CSO',
       'unknown': 'Unknown'
     }
 
 className: str = classNames[classNum]
 
 if len(sys.argv) < 3:
-    print('Using default message...')
-    message = f'Here are your most recent grades for {className}.  I do sometimes make mistakes or miss things, so please let me know if you have any questions or notice any discrepancies.\n\n'
+    custom_msg = outdir + '/grades_msg.txt'
+    if os.path.exists(custom_msg):
+        print(f'Loading message from {custom_msg}...')
+        with open(custom_msg, 'r') as msgfile:
+            message = msgfile.read()
+    else:
+        print('Using default message...')
+        message = f'Here are your most recent grades for {className}.  I do sometimes make mistakes or miss things, so please let me know if you have any questions or notice any discrepancies.\n\n'
 else:
     print(f'Loading message from {sys.argv[2]}...')
     with open(sys.argv[2], 'r') as msgfile:
