@@ -86,6 +86,7 @@ classes = \
     { '410': '16mvdNjsiAzveO6grB3741wISR4u628F0vB9tsSOQYdQ'
     , '382': '1bJZXwOO780AibSvZn7aKY5iHGaBDqjJnaFxSF8A9y-k'
     , '382g': '1wot8iwksKuvJGihsPJbSll1hOiGsmEN4sXOr1MtKlzw'
+    , '150': '1ZFINQlEFSW97ufsa4rmx7E401RJULjzWLwPEXT9eO3E'
     }
 
 def main():
