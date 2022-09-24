@@ -124,7 +124,7 @@ def main():
                     if 'DL' in s:
                         dl_col = s.index('DL')
 
-                elif (assignment in s[assignment_col] and (dl_col == -1 or s[dl_col] != 'Y')):
+                elif (assignment.lower() in s[assignment_col].lower() and (dl_col == -1 or s[dl_col] != 'Y')):
                     student_name = s[1].replace('/','')
 
                     print("---------- %s ----------" % student_name)
