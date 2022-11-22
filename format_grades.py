@@ -140,9 +140,13 @@ with open(gradebook_file, 'r') as gradebook:
                     student_file.write(message)
                     for i in range(len(header)):
                         if ('(!)' not in header[i] and header[i] != ''):
-                            field = header[i]
-                            if (field[0] == '-'):
-                                field = '  ' + field[1:]
+
+                            # Translate consecutive - characters into indentation
+                            j = 0
+                            while j < len(header[i]) and header[i][j] == '-':
+                                j += 1
+                            field = ('  ') * j + header[i][j:]
+
                             if (totals == [] or totals[i] == '' or totals[i] == 'Total'):
                                 student_file.write('%-25s: %s\n' % (field, entry[i]))
                             else:
