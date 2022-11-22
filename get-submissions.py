@@ -87,6 +87,7 @@ classes = \
     , '382': '1bJZXwOO780AibSvZn7aKY5iHGaBDqjJnaFxSF8A9y-k'
     , '382g': '1wot8iwksKuvJGihsPJbSll1hOiGsmEN4sXOr1MtKlzw'
     , '150': '1ZFINQlEFSW97ufsa4rmx7E401RJULjzWLwPEXT9eO3E'
+    , '150g': '1I22vjjMICsFf-DKzBDiBX6Db72vnhAUbxleuNYgbEuI'
     }
 
 def main():
