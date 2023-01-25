@@ -36,7 +36,7 @@ for f in files:
             if template.endswith('txt'):
                 template_txt = template_file.read()
             else:
-                template_txt = chevron.render(template_file, {'fname': name.split(' ')[0]})
+                template_txt = chevron.render(template_file, {'fname': ' '.join(name.split(' ')[:-1])})
 
         mutt_process = subprocess.Popen(['mutt', '-a', f, '-s', subject, '--', email], stdin=subprocess.PIPE)
         mutt_process.stdin.write(bytes(template_txt, 'utf-8'))
