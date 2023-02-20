@@ -28,7 +28,7 @@ with Path("~/.aliases/stu.aliases").expanduser().open() as aliases:
             alias_dict[m.group(1).lower()] = m.group(2)
 
 for f in files:
-    name = re.split('/', f)[0]
+    name = re.split('/', f.strip())[0]
     if name.lower() in alias_dict:
         email = alias_dict[name.lower()]
         print(f'Sending {f} to {name} ({email})...')
