@@ -42,7 +42,7 @@ for f in files:
         mutt_process.stdin.write(bytes(template_txt, 'utf-8'))
         mutt_process.stdin.close()
 
-        time.sleep(0.5)
+        time.sleep(1)
 
     else:
         print(f'WARNING: no email found for {name}!')
