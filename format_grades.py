@@ -119,7 +119,7 @@ with open(gradebook_file, 'r') as gradebook:
             if droppedColumn != -1:
                 dropped = entry[droppedColumn]
 
-            if email != '' and (droppedColumn == -1 or dropped != '1'):
+            if email != '' and (droppedColumn == -1 or (dropped != '1' and dropped != 'Y')):
                 print("Formatting grades for " + email + "...")
                 d = outdir + "/" + email
                 try:
