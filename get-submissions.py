@@ -120,7 +120,12 @@ def main():
             for s in submissions:
                 if first_line:
                     first_line = False
-                    assignment_col = s.index('Assignment')
+                    assignment_col = 2
+                    try:
+                        assignment_col = s.index('Assignment')
+                    except ValueError:
+                        assignment_col = s.index('Project')
+
                     dl_col = -1
                     if 'DL' in s:
                         dl_col = s.index('DL')
