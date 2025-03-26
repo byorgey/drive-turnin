@@ -143,6 +143,9 @@ def main():
                             submissionfile.write(line + '\n')
                     for f in s[assignment_col + 1].split(', '):
                         file_id = f.split('=')[-1]
+                        if file_id == '':
+                            print('Submission with no files attached, skipping...')
+                            continue
                         filename = service.files().get(fileId=file_id).execute()['name']
                         filename = re.sub(r" - [^.]*", '', filename)
                         try:
