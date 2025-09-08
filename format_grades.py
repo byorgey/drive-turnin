@@ -6,7 +6,7 @@ import sys
 import csv
 from pathlib import Path
 
-CURSEMESTER = '25G'
+CURSEMESTER = '25L'
 
 if len(sys.argv) < 2:
     print("Usage: format_grades.py <gradebook> [<message file>] [<subject>] [<output dir>]")
