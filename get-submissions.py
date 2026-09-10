@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+# Based on https://developers.google.com/workspace/drive/api/quickstart/python
+
 from __future__ import print_function
 import httplib2
 import os
@@ -12,20 +14,14 @@ import re
 args = sys.argv
 sys.argv = [sys.argv[0]]
 
-from apiclient import discovery
-from apiclient.http import MediaIoBaseDownload
-
-from oauth2client import client
-from oauth2client import tools
-from oauth2client.file import Storage
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+from googleapiclient.http import MediaIoBaseDownload
 
 import csv
-
-# try:
-#     import argparse
-#     flags, extras = argparse.ArgumentParser(parents=[tools.argparser]).parse_known_args(None)
-# except ImportError:
-#     flags = None
 
 # If modifying these scopes, delete your previously saved credentials
 # at ~/.credentials/drive-python-quickstart.json
@@ -47,20 +43,26 @@ def get_credentials():
     credential_dir = os.path.join(home_dir, '.credentials')
     if not os.path.exists(credential_dir):
         os.makedirs(credential_dir)
+
     credential_path = os.path.join(credential_dir,
                                    'drive-python-quickstart.json')
 
-    store = Storage(credential_path)
-    credentials = store.get()
-    if not credentials or credentials.invalid:
-        flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
-        flow.user_agent = APPLICATION_NAME
-        # if flags:
-        #     credentials = tools.run_flow(flow, store, flags)
-        # else: # Needed only for compatibility with Python 2.6
-        credentials = tools.run_flow(flow, store)
+    creds = None
+    if os.path.exists(credential_path):
+        creds = Credentials.from_authorized_user_file(credential_path, SCOPES)
+
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(os.path.join(credential_dir, CLIENT_SECRET_FILE), SCOPES)
+            creds = flow.run_local_server(port=0)
+
         print('Storing credentials to ' + credential_path)
-    return credentials
+        with open(credential_path, "w") as token:
+            token.write(creds.to_json())
+
+    return creds
 
 # def main():
 #     """Shows basic usage of the Google Drive API.
@@ -94,9 +96,8 @@ def main():
     else:
         file_id = key
 
-    credentials = get_credentials()
-    http = credentials.authorize(httplib2.Http())
-    service = discovery.build('drive', 'v3', http=http)
+    creds = get_credentials()
+    service = build('drive', 'v3', credentials=creds)
 
     if (key[-1] == 'g'):
         filename = 'gradebook-%s.csv' % key[:-1]
